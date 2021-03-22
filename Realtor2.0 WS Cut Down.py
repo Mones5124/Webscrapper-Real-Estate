@@ -24,7 +24,7 @@ User_Agent = str(ua.random) #always gets a random UserAgent
 #townname_ = 'Jersey City'
 #townname_ = "Newark"
 #.capitalize() capitalizes the word
-#townname_ = str(input("Name of Town: ")).lower()
+townname_ = str(input("Name of Town: ")).lower()
 #townname_ = "East Rutherford"
 
 
@@ -152,7 +152,7 @@ def make_houses_dataframe(t_dict):
     #print(og_df)
 
     #print(realtor_houses)
-    folders = "/Users/juanm./Documents/Coding/Data Science?/github/Webscrapper-Real-Estate/"
+    #folders = "/Users/juanm./Documents/Coding/Data Science?/github/Webscrapper-Real-Estate/"
     #filename = 'Houses_last.csv'
     og_df.to_csv(folders+townname+".csv", encoding='utf-8', index=False)
 
@@ -181,8 +181,8 @@ rent = int(rent[0])*1000 + int(rent[1])
 
 """Creating a url"""
 #sys.exit()
-#budget = int(input("What is your budget in thousands of dollars?" + "\n"))
-budget = 600
+budget = int(input("What is your budget in thousands of dollars?" + "\n"))
+#budget = 600
 budget = "price-na-" + str(budget*1000)
 type_ = 'type-multi-family-home/'
 #extra = ""
