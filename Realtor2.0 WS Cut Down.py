@@ -17,14 +17,17 @@ import re
 from fake_useragent import UserAgent
 ua = UserAgent()
 User_Agent = str(ua.random) #always gets a random UserAgent
-
+#User_Agent = "Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"
+#print(User_Agent)
+#User_Agent = "*"
+#townname_ = "Bayonne"
 #townname_ = 'Guttenberg'
 #townname_ = 'North Bergen'
 #townname_ = 'Union City'
-#townname_ = 'Jersey City'
+townname_ = 'Jersey City'
 #townname_ = "Newark"
 #.capitalize() capitalizes the word
-townname_ = str(input("Name of Town: ")).lower()
+#townname_ = str(input("Name of Town: ")).lower()
 #townname_ = "East Rutherford"
 
 
@@ -48,12 +51,14 @@ try:
     i = og_df.i.to_list()   #creates i into its own list
     #start = og_df["i"].tail(1)
     #start = len(og_df) #finds the length of the dataframe
-
+    """
     if i[-1]<max(i): #if the last one is less than the max, it means it is not on page 1 anymore
         start = find_page(i)
     else:
         start = i[-1]+1
     #sys.exit()
+    """
+    start = i[-1]+1
 except:
     start = 0
 #sys.exit()
@@ -68,13 +73,15 @@ price = address = beds = baths = prop_taxes = ""
 #go to line 118
 def check_house_size(url):
     #User_Agent = str(ua.random) 
-    #my_session.headers.update({'User-Agent': User_Agent, "previousUrl": realtor_url})
+    #my_session.headers.update({'User-Agent': User_Agent, "referer": realtor_url})
     prop_session = my_session.get(url)
     prop_soup = BeautifulSoup(prop_session.text, 'html.parser')
-
+    #print(prop_soup.text)
+    #sys.exit()
     #finds important house stats
     price, beds, baths, address, prop_taxes = find_house_stats(prop_soup)
     #finds the description of the house
+    
     prop_details = prop_soup.find(class_="content", attrs={"id": "content-property_details"})
     #just checks the entire description all at once
     #print(prop_details.text)
@@ -102,7 +109,7 @@ def check_house_size(url):
 def find_house_stats(soup):
     #finds the description of the house
     #print()
-    
+    prop_taxes = ""
     prop_taxes = find_property_taxes(soup)
     #finds the price
     try:
@@ -113,7 +120,10 @@ def find_house_stats(soup):
         t_address = soup.find(class_="address")
         print(t_address.text)
     except:
+        #print(soup.text)
         print("You have been blocked, try again in a couple of minutes")
+        print("Inside of find_house_stats")
+
 
     #finds the beds
     t_beds = soup.find(attrs={"data-label": "pc-meta-beds"})
@@ -173,48 +183,84 @@ def zumper_url():
     print(townname_space+" has a median rent of "+ rent1 +".") 
     return (rent1)
 
-rent = zumper_url()
-rent = re.findall(r'\d+', rent)
-rent = int(rent[0])*1000 + int(rent[1])
+#rent = zumper_url()
+#rent = re.findall(r'\d+', rent)
+#rent = int(rent[0])*1000 + int(rent[1])
+rent = 1800
 #sys.exit()
 #right now, the code gets blocked after 10 items
 
 """Creating a url"""
 #sys.exit()
-budget = int(input("What is your budget in thousands of dollars?" + "\n"))
-#budget = 600
+#budget = int(input("What is your budget in thousands of dollars?" + "\n"))
+budget = 700
 budget = "price-na-" + str(budget*1000)
 type_ = 'type-multi-family-home/'
 #extra = ""
 extra = "beds-3/baths-3/"   #2 2-1 and one 1-1
 #making it more likely to be a triplex
 
-realtor_url = 'https://www.realtor.com/realestateandhomes-search/'+townname+'_NJ/'+extra+str(type_)+str(budget)+'/sby-6'
+realtor_url = 'https://www.realtor.com/realestateandhomes-search/'+townname+'_NJ/'+extra+str(type_)+str(budget)#+'/sby-6'
 #'/show-newest-listings'
 #print(realtor_url)
-my_session = requests.session()
-my_session.headers.update({'Accept-Encoding': 'gzip','Accept-Language': 'en-US,en;q=0.9,es;q=0.8','Upgrade-Insecure-Requests': '1', 
-'User-Agent': User_Agent, 
-'previousUrl': 'https://www.realtor.com/realestateandhomes-search/'})
+#User_Agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36'
 
+#print(townname)
+
+my_session = requests.session()
+
+my_session.headers.update({'Accept-Encoding': 'gzip, deflate, br','Accept-language': 'en-US,en;q=0.9','Upgrade-Insecure-Requests': '1', 
+'User-agent': User_Agent, 'Referer': 'https://www.realtor.com/'
+})
+
+"""
+header = {'Accept-Encoding': 'gzip, deflate, br','Accept-Language': 'en-US,en;q=0.9','Upgrade-Insecure-Requests': '1', 
+'User-Agent': User_Agent}
+# 'Referer': 'https://www.google.com/', 'PreviousUrl': 'https://www.google.com/'}
+"""
+#'https://www.realtor.com/'
+""",
+"sec-fetch-dest": "document", "sec-fetch-mode": "navigate", "sec-fetch-site": "same-origin", "sec-fetch-user": "?1",
+"sec-gpc": "1", "cache-control": "max-age=0",
+"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+}
+"""
+
+#+townname+'_NJ/beds-3/type-multi-family-home'
+
+"""
+'previousUrl': 'https://www.realtor.com/realestateandhomes-search', 
+'Referer': 'https://www.realtor.com/realestateandhomes-search'})#,
+#'referer': 'https://www.realtor.com/realestateandhomes-search'})
+"""
 
 """Actual Code"""
 #print("Going again")
 #webbrowser.open(realtor_url)
-realtor = my_session.get(realtor_url)
-#must be a GET request
+#sys.exit()
+#import urllib
+#has really good proxies to use
+#print(urllib.request.getproxies())
+#sys.exit()
+#url = "https://www.imdb.com/search/title/?groups=top_1000&ref_=adv_prv"
+realtor = my_session.get(realtor_url)#, headers = header)
+#print(realtor.cookies)
+print(realtor.request.headers)
+#sys.exit()
+#, proxies=urllib.request.getproxies())
+#must be a GET) request
 
 html_soup = BeautifulSoup(realtor.text, 'html.parser')
-#prop = html_soup.find(class_="property-list")
-properties = html_soup.findAll(class_='component_property-card')#.findall('li')
-#print(properties)
-
-#print(html_soup)
+#print(html_soup.text)
 #check for blocking
 #webbrowser.open(realtor_url)
 blocktitle = html_soup.find("title")
+
 if "Pardon Our Interruption" in blocktitle:
+    #print(html_soup.text)
+    #webbrowser.open(realtor_url)
     print("You have been blocked, try again in a couple of minutes")
+    print("From the Start of the Code")
     sys.exit()
 
 try:
@@ -222,9 +268,14 @@ try:
 except:
     tn = townname
 
+#prop = html_soup.find(class_="property-list")
+properties = html_soup.findAll(class_='component_property-card')#.findall('li')
+#print(properties)
+
 #start = 0
 i = 0
-#print(start)
+print("Starting")
+wait(random.randint(0, 100)/100)
 for prop in properties:
     i+=1 
     if i < start:
@@ -233,18 +284,20 @@ for prop in properties:
     elif tn.capitalize() in prop.text:
         """Getting links to create a new session at the reference website"""
 
-        href = prop.find("a")
-        href = href.get('href') #gets what is inside of the href tag
+        href = prop.find("a")   #for each section of the html with a property, it finds the first a section
+        href = href.get('href') #gets what is inside of the href tag in the first a section (ending to link)
         #new website uses the base of 'https://www.realtor.com'
         prop_link = 'https://www.realtor.com' + str(href)
-        
+        #wait(random.randint(2,10))
         size, price, beds, baths, address, prop_taxes = (check_house_size(prop_link))  #gives the house size as a string
-
+        #print(size)
+        #sys.exit()
         total_rent = (int(size[0]) * rent)
         temp_add_list = {"i": i, "Size": size, "Price": price, "Gross Rent": total_rent, "Beds": beds, "Baths": baths, "Address": address, "Taxes": prop_taxes, "Urls": prop_link}
 
         make_houses_dataframe(temp_add_list)
-        #wait(random.randint(0, 1)/100)  #gets a random amount of milliseconds and waits a really tiny amount of time
+        wait(random.randint(50, 250)/100)  #gets a random amount of milliseconds and waits a really tiny amount of time
+        #between 0.5 and 2.5 seconds wait seems to not get blocked
         #wait one second to see if that allows it to work better
 
     elif 'Advertisement' not in prop.text:
@@ -262,3 +315,10 @@ print("I'm sorry for your inconvenience.")
 #next_page()
 #sys.exit()
 #try making a code so it can add "/pg-2" or "/pg-3" at the end once it can't find anymore properties
+
+"""
+options = webdriver.ChromeOptions();
+options.add_argument('headless');
+options.add_argument('window-size=1200x600'); // optional
+driver = webdriver.Chrome(options=op)
+"""
